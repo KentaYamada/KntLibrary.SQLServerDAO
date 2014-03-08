@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KntLibrary.DAO.SqlServer
+namespace KntLibrary.SQLServerDAO
 {
     /// <summary>
     /// SQL Serverパラメータ作成クラス

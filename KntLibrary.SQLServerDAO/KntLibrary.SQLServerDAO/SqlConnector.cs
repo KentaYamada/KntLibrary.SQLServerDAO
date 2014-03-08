@@ -3,9 +3,7 @@ using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
 
-using KntLibrary.DAO.Interface;
-
-namespace KntLibrary.DAO.SqlServer
+namespace KntLibrary.SQLServerDAO
 {
     /// <summary>
     /// SQL Server接続クラス

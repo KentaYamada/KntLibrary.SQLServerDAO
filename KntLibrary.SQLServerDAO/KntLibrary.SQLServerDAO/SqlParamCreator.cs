@@ -4,9 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 
-using KntLibrary.DAO.Interface;
-
-namespace KntLibrary.DAO.SqlServer
+namespace KntLibrary.SQLServerDAO
 {
     /// <summary>
     /// SQL パラメータ生成クラス

@@ -1,5 +1,5 @@
 ﻿
-namespace KntLibrary.DAO.Interface
+namespace KntLibrary.SQLServerDAO
 {
 	/// <summary>
 	/// DataBase接続インターフェース

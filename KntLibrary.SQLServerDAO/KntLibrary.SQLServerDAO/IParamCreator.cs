@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace KntLibrary.DAO.Interface
+namespace KntLibrary.SQLServerDAO
 {
 	/// <summary>
 	/// DBパラメータインターフェース

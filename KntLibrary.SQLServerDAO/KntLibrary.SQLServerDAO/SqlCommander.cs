@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
 
-namespace KntLibrary.DAO.SqlServer
+namespace KntLibrary.SQLServerDAO
 {
     /// <summary>
     /// SQL実行クラス
