@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Reflection;
 
 namespace KntLibrary.SQLServerDAO
 {
-    /// <summary>
-    /// SQL パラメータ生成クラス
-    /// </summary>
     public sealed class SqlParamCreator : IParamCreator
 	{
 		#region Fields
@@ -39,10 +35,8 @@ namespace KntLibrary.SQLServerDAO
         #region Public Methods
 
         /// <summary>
-        /// DBNull値変換
+        /// Convert to DBNull.value
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public object IsDBNull(object value)
         {
             if (string.IsNullOrWhiteSpace(Convert.ToString(value)))
@@ -54,13 +48,7 @@ namespace KntLibrary.SQLServerDAO
                 return value;
             }
         }
-
-        /// <summary>
-        /// パラメータ追加
-        /// </summary>
-        /// <param name="paramName">パラメータ名</param>
-        /// <param name="dbType">マッピングタイプ</param>
-        /// <param name="value">値</param>
+       
         public void Add(string paramName, DbType dbType, object value)
         {
 			var param = new SqlParameter();
@@ -73,11 +61,6 @@ namespace KntLibrary.SQLServerDAO
 			this._InnerParameters.Add(param);
         }
 
-		/// <summary>
-		/// パラメータ追加
-		/// </summary>
-		/// <param name="paramName">パラメータ名</param>
-		/// <param name="table">データテーブル</param>
 		public void Add(string paramName, DataTable table)
 		{
 			var param = new SqlParameter();
