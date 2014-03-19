@@ -6,16 +6,16 @@ using System.Data.SqlClient;
 namespace KntLibrary.SQLServerDAO
 {
     /// <summary>
-    /// SQL Server接続クラス
+    /// MS SQL-Server connector class
     /// </summary>
 	internal sealed class SqlConnector : IConnector, IDisposable
 	{
 		#region Fields
 
-		/// <summary>DB接続内部保持</summary>
+		/// <summary>Inner connection object</summary>
 		private SqlConnection _InnerConnection = null;
 
-		/// <summary>DB接続情報提供</summary>
+		/// <summary>Get Connection Object</summary>
 		internal SqlConnection Connection
 		{
 			get
@@ -38,9 +38,9 @@ namespace KntLibrary.SQLServerDAO
 
 		#region Public Methods
 
-		/// <summary>
-		/// DataBase接続
-		/// </summary>
+        /// <summary>
+        /// Open Database
+        /// </summary>
         public void Open()
 		{
 			if ( (null != this._InnerConnection) && (ConnectionState.Open != this._InnerConnection.State) )
@@ -50,7 +50,7 @@ namespace KntLibrary.SQLServerDAO
 		}
 
 		/// <summary>
-		/// DataBase接続切断
+		/// Close up DataBase
 		/// </summary>
 		public void Close()
 		{
@@ -61,7 +61,7 @@ namespace KntLibrary.SQLServerDAO
 		}
 
 		/// <summary>
-		/// リソース解放
+		/// Clean up Resource 
 		/// </summary>
         public void Dispose()
 		{
