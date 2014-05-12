@@ -65,64 +65,77 @@ namespace KntLibrary.SQLServerDAO
 		}
 
 		/// <summary>
-		/// Sqve data
+		/// Save data
 		/// </summary>
-		public static int Save(string query, params SqlParameter[] args)
+		public static bool Save(List<string> queries)
 		{
-            using (var connector = new SqlConnector())
-			using (var command = new SqlCommand(query))
+			using (var connector = new SqlConnector())
+			using (var command = new SqlCommand())
 			{
-                command.Connection = connector.Connection;
+				int affectedRow = 0;
 
-				SqlCommander.SetParameters(command, args);
-                
-                connector.Open();
+				try
+				{
+					using (var tran = new TransactionScope())
+					{
+						connector.Open();
+						command.Connection = connector.Connection;
 
-                int count = 0;
+						foreach (string q in queries)
+						{
+							command.CommandText = q;
+							affectedRow += command.ExecuteNonQuery();
+						}
 
-                using (var tran = new TransactionScope())
-                {
-                    count = command.ExecuteNonQuery();
+						tran.Complete();
+					}
+				}
+				finally
+				{
+					connector.Close();
+				}
 
-                    if (0 < count)
-                    {
-                        tran.Complete();
-                    }
-                }
-
-                connector.Close();
-
-                return count;
+				return affectedRow < 0 ? false : true;
 			}
 		}
 
-        /// <summary>
-        /// Sqve data
-        /// </summary>
-        public static int Save(string query)
-        {
-            return SqlCommander.Save(query);
-        }
+		/// <summary>
+		/// Entry data
+		/// </summary>
+		/// <param name="query">Insert or Update SQL</param>
+		/// <param name="args">Application data</param>
+		public static bool Save(string query, params SqlParameter[] args)
+		{
+			using (var connector = new SqlConnector())
+			using (var command = new SqlCommand(query, connector.Connection))
+			using (var tran = new TransactionScope())
+			{
+				int affectedRow = 0;
+				try
+				{
+					connector.Open();
+					SqlCommander.SetParameters(command, args);
 
-        /// <summary>
-        /// Sqve data
-        /// </summary>
-        public static int Save(List<string> queries)
-        {
-            int count = 0;
+					affectedRow = command.ExecuteNonQuery();
+					
+					if (0 < affectedRow)
+					{
+						tran.Complete();
+					}
+				}
+				finally
+				{
+					connector.Close();
+				}
 
-            foreach (string query in queries)
-            {
-                count += SqlCommander.Save(query);
-            }
-
-            return count;
-        }
+				return affectedRow < 0 ? false : true;
+			}
+		}
 
 		/// <summary>
 		/// Execute delete query
 		/// </summary>
-		public static int Delete(string query, params SqlParameter[] args)
+		public static bool Delete(string query, params SqlParameter[] args)
 		{
 			return SqlCommander.Save(query, args);
 		}
@@ -130,7 +143,7 @@ namespace KntLibrary.SQLServerDAO
         /// <summary>
         /// Execute delete query
         /// </summary>
-        public static int Delete(List<string> queries)
+        public static bool Delete(List<string> queries)
 		{
 			return SqlCommander.Save(queries);
 		}
@@ -158,15 +171,35 @@ namespace KntLibrary.SQLServerDAO
         /// <summary>
         /// Execute stored procedure
         /// </summary>
-		public static int ExecStoredProcedure(string procName, params SqlParameter[] args)
+		public static bool ExecStoredProcedure(string procName, params SqlParameter[] args)
 		{
             using (var connector = new SqlConnector())
-			using (var command = new SqlCommand(procName))
+			using (var command = new SqlCommand(procName,connector.Connection))
 			{
-				SqlCommander.SetParameters(command, args);
-                command.CommandType = CommandType.StoredProcedure;
+				int affectedRow = 0;
 
-                return command.ExecuteNonQuery();
+				try
+				{
+					using (var tran = new TransactionScope())
+					{
+						connector.Open();
+						SqlCommander.SetParameters(command, args);
+						command.CommandType = CommandType.StoredProcedure;
+
+						affectedRow = command.ExecuteNonQuery();
+
+						if (0 < affectedRow)
+						{
+							tran.Complete();
+						}
+					}
+				}
+				finally
+				{
+					connector.Close();
+				}
+
+				return affectedRow < 0 ? false : true;
 			}
 		}
 
