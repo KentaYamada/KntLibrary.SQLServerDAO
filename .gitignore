@@ -2,3 +2,5 @@
 /KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO/bin
 /KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO.csproj.user
 /KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO.suo
+/KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO.UnitTest/obj
+/KntLibrary.SQLServerDAO/KntLibrary.SQLServerDAO.UnitTest/bin
