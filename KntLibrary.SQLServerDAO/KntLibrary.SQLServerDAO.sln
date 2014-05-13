@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KntLibrary.SQLServerDAO", "KntLibrary.SQLServerDAO\KntLibrary.SQLServerDAO.csproj", "{3CA2AD7F-11D9-40B2-9363-9DDA16337F36}"
 EndProject
-<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KntLibrary.SQLServerDAO.UnitTest", "KntLibrary.SQLServerDAO.UnitTest\KntLibrary.SQLServerDAO.UnitTest.csproj", "{FEE46AA5-EA6E-4D5F-8878-5DB3F4AD9745}"
-=======
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KntLibrary.SQLServerDAO.UnitTest", "KntLibrary.SQLServerDAO.UnitTest\KntLibrary.SQLServerDAO.UnitTest.csproj", "{1DAF08CA-2508-4EFB-BA04-85922517A013}"
->>>>>>> 42b1ac408071f79f2581e1ce1c741f02e5f7a781
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,17 +15,10 @@ Global
 		{3CA2AD7F-11D9-40B2-9363-9DDA16337F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA2AD7F-11D9-40B2-9363-9DDA16337F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA2AD7F-11D9-40B2-9363-9DDA16337F36}.Release|Any CPU.Build.0 = Release|Any CPU
-<<<<<<< HEAD
 		{FEE46AA5-EA6E-4D5F-8878-5DB3F4AD9745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FEE46AA5-EA6E-4D5F-8878-5DB3F4AD9745}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEE46AA5-EA6E-4D5F-8878-5DB3F4AD9745}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEE46AA5-EA6E-4D5F-8878-5DB3F4AD9745}.Release|Any CPU.Build.0 = Release|Any CPU
-=======
-		{1DAF08CA-2508-4EFB-BA04-85922517A013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DAF08CA-2508-4EFB-BA04-85922517A013}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DAF08CA-2508-4EFB-BA04-85922517A013}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DAF08CA-2508-4EFB-BA04-85922517A013}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> 42b1ac408071f79f2581e1ce1c741f02e5f7a781
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
