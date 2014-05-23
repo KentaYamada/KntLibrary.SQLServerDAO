@@ -71,7 +71,7 @@ namespace KntLibrary.SQLServerDAO
 			using (var connector = new SqlConnector())
 			using (var command = new SqlCommand())
 			{
-				command.connection = connector.Connection;
+				command.Connection = connector.Connection;
 				
 				int affectedRow = 0;
 				
@@ -119,14 +119,6 @@ namespace KntLibrary.SQLServerDAO
 		public static int Delete(string query, params SqlParameter[] args)
 		{
 			return SqlCommander.Save(query, args);
-		}
-
-        /// <summary>
-        /// Execute delete query
-        /// </summary>
-        public static int Delete(List<string> queries)
-		{
-			return SqlCommander.Save(queries);
 		}
 
         /// <summary>
