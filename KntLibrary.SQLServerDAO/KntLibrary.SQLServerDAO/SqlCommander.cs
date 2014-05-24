@@ -57,6 +57,7 @@ namespace KntLibrary.SQLServerDAO
                     var table = new DataTable();
 
 					adapt.Fill(table);
+					command.Parameters.Clear();
 
                     return table;
                 }
@@ -108,6 +109,7 @@ namespace KntLibrary.SQLServerDAO
 				connector.Open();
 				affectedRow = command.ExecuteNonQuery();
 				tran.Complete();
+				command.Parameters.Clear();
 
 				return affectedRow;
 			}
@@ -135,6 +137,8 @@ namespace KntLibrary.SQLServerDAO
 
 				int count = (int)command.ExecuteScalar();
 
+				command.Parameters.Clear();
+
 				connector.Close();
 
 				return count;
@@ -158,6 +162,7 @@ namespace KntLibrary.SQLServerDAO
 					connector.Open();
 					affectedRow = command.ExecuteNonQuery();
 					tran.Complete();
+					command.Parameters.Clear();
 				}
 
 				return affectedRow;
