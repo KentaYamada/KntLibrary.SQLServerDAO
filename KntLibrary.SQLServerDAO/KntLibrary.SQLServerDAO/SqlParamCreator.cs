@@ -75,7 +75,7 @@ namespace KntLibrary.SQLServerDAO
 			param.ParameterName = paramName;
             param.Value = table;
             param.SqlDbType = SqlDbType.Structured;
-			param.Direction = ParameterDirection.Input;
+			param.Direction = ParameterDirection.Input; 
 
 			this._innerSqlParameters.Add(param);
 		}
