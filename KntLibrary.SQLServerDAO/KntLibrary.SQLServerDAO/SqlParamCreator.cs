@@ -2,83 +2,101 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
+
+using KntLibrary.SQLServerDAO.Interfaces;
 
 namespace KntLibrary.SQLServerDAO
 {
-    public sealed class SqlParamCreator : IParamCreator
-	{
-		#region Fields
+    public class SqlParamCreator : IParamCreation
+    {
+        #region Fields
 		
-		private List<SqlParameter> _innerSqlParameters = null;
+        private List<SqlParameter> _sqlParameters;
 
-        private List<object> _innerParameters = null;
-
-		public SqlParameter[] SqlParameters
-		{
-			get
-			{ 
-				return this._innerSqlParameters.ToArray(); 
-			}
-		}
-
-        public object[] Parameters
+        public SqlParameter[] SqlParameters
         {
-            get
+	        get
+	        { 
+		        return this._sqlParameters.ToArray(); 
+	        }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public SqlParamCreator()
+        {
+            this._sqlParameters = new List<SqlParameter>();
+        }
+
+        #endregion
+
+        private string AddPrefix(string paramName)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
             {
-                return this._innerParameters.ToArray();
+                throw new ArgumentNullException("パラメータ名を空白にすることはできません。");
             }
+            
+            return paramName.IndexOf('@') < 0 ? string.Format("@{0}", paramName) : paramName;
         }
-
-		#endregion
-
-		#region Constructors
-
-		public SqlParamCreator()
-        {
-            this._innerSqlParameters = new List<SqlParameter>();
-            this._innerParameters = new List<object>();
-        }
-
-        #endregion
-
-        #region Private Mehtods
-        #endregion
 
         #region Public Methods
 
-        public object IsDBNull(object value)
+        public void Add(string paramName, DataTable table)
         {
-            return value ?? DBNull.Value;
+	        var param = new SqlParameter();
+			
+	        param.Direction = ParameterDirection.Input;
+	        param.ParameterName = this.AddPrefix(paramName);
+	        param.SqlDbType = SqlDbType.Structured;
+	        param.Value = table;
+
+	        this._sqlParameters.Add(param);
         }
 
-        public void Add(object value)
+        public void Add(string paramName, SqlDbType type, object value)
         {
-            this._innerParameters.Add(value);
+	        var param = new SqlParameter();
+
+	        param.Direction = ParameterDirection.Input;
+	        param.SqlDbType = type;
+            param.ParameterName = this.AddPrefix(paramName);
+	        param.Value = this.ToDBNull(value);
+
+	        this._sqlParameters.Add(param);
         }
 
-        public void Add(string paramName, DbType dbType, object value)
+        public void Add<T>(T args) where T : class
         {
-			var param = new SqlParameter();
+            if (args == null)
+            {
+                throw new ArgumentNullException();
+            }
 
-			param.ParameterName = paramName;
-			param.Value = this.IsDBNull(value);
-            param.DbType = dbType;
-			param.Direction = ParameterDirection.Input;
+            var param = new SqlParameter();
 
-			this._innerSqlParameters.Add(param);
+            foreach (PropertyInfo arg in args.GetType().GetProperties())
+            {
+                param.Direction = ParameterDirection.Input;
+                param.ParameterName = string.Format("@{0}",arg.Name);
+                param.Value = this.ToDBNull(arg.GetValue(args, null));
+
+                this._sqlParameters.Add(param);
+            }
         }
 
-		public void Add(string paramName, DataTable table)
-		{
-			var param = new SqlParameter();
+        public void Clear()
+        {
+            this._sqlParameters.Clear();
+        }
 
-			param.ParameterName = paramName;
-            param.Value = table;
-            param.SqlDbType = SqlDbType.Structured;
-			param.Direction = ParameterDirection.Input; 
-
-			this._innerSqlParameters.Add(param);
-		}
+        public object ToDBNull(object value)
+        {
+            return Convert.ToString(value) == string.Empty ? DBNull.Value : value;
+        }
 
         #endregion
     }
