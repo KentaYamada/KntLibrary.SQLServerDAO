@@ -1,82 +1,54 @@
 ﻿using System;
-using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
 
+using KntLibrary.SQLServerDAO.Interfaces;
+
 namespace KntLibrary.SQLServerDAO
 {
-    /// <summary>
-    /// MS SQL-Server connector class
-    /// </summary>
-	internal sealed class SqlConnector : IConnector, IDisposable
+    internal class SqlConnector : IConnection, IDisposable
 	{
-		#region Fields
+        private SqlConnection _connection = null;
 
-		/// <summary>Inner connection object</summary>
-		private SqlConnection _InnerConnection = null;
+        internal SqlConnection GetConnection { get { return this._connection; }}
 
-		/// <summary>Get Connection Object</summary>
-		internal SqlConnection Connection
-		{
-			get
-			{
-				return this._InnerConnection;
-			}
-		}
+        internal SqlConnector() 
+        {
+	        this._connection = new SqlConnection();
+            this._connection.ConnectionString = ConfigurationManager.ConnectionStrings["DefaultDatabase"].ConnectionString;
+        }
 
-		#endregion
+        internal SqlConnector(string connectionName)
+        {
+            if(string.IsNullOrWhiteSpace(connectionName))
+            {
+                throw new ArgumentNullException();
+            }
 
-		#region Constructors
+            this._connection = new SqlConnection();
+            this._connection.ConnectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
+        }
 
-		internal SqlConnector() 
-		{
-			this._InnerConnection = new SqlConnection();
-			this._InnerConnection.ConnectionString = ConfigurationManager.AppSettings["ConnectString"].ToString();
-		}
-
-        #endregion
-
-		#region Public Methods
-
-        /// <summary>
-        /// Open Database
-        /// </summary>
         public void Open()
-		{
-			if ( (null != this._InnerConnection) && (ConnectionState.Open != this._InnerConnection.State) )
-			{
-				this._InnerConnection.Open();
-			}
-		}
+        {
+	        if (null != this._connection)
+	        {
+		        this._connection.Open();
+	        }
+        }
 
-		/// <summary>
-		/// Close up DataBase
-		/// </summary>
-		public void Close()
-		{
-			if ( (null != this._InnerConnection) && (ConnectionState.Closed != this._InnerConnection.State) )
-			{
-				this._InnerConnection.Close();
-			}
-		}
+        public void Close()
+        {
+            this.Dispose();
+        }
 
-		/// <summary>
-		/// Clean up Resource 
-		/// </summary>
         public void Dispose()
-		{
-			if (ConnectionState.Closed != this._InnerConnection.State)
-			{
-				this._InnerConnection.Close();
-			}
+        {
+	        if (null != this._connection)
+	        {
+		        this._connection.Dispose();
+	        }
+        }
 
-			if (null != this._InnerConnection)
-			{
-				this._InnerConnection.Dispose();
-				this._InnerConnection = null;
-			}
-		}
-
-		#endregion
 	}
 }

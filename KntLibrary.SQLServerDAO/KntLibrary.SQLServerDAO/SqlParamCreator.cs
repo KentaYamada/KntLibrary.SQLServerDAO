@@ -76,10 +76,10 @@ namespace KntLibrary.SQLServerDAO
                 throw new ArgumentNullException();
             }
 
-            var param = new SqlParameter();
-
             foreach (PropertyInfo arg in args.GetType().GetProperties())
             {
+                var param = new SqlParameter();
+
                 param.Direction = ParameterDirection.Input;
                 param.ParameterName = string.Format("@{0}",arg.Name);
                 param.Value = this.ToDBNull(arg.GetValue(args, null));

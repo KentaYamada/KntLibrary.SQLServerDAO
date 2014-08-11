@@ -1,171 +1,122 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Transactions;
 
 namespace KntLibrary.SQLServerDAO
 {
-    /// <summary>
-    /// MS SQL-Server Execute command class
-    /// </summary>
 	public static class SqlCommander
 	{
 		#region Private static methods
-		/// <summary>
-		/// Set parameters to SqlCommand object
-		/// </summary>
-        private static void SetParameters(SqlCommand command, SqlParameter[] args)
-        {
-            command.Parameters.Clear();
 
-            if ((null != args) && (0 < args.Length))
+        private static SqlCommand BuildCommand(string commandText, SqlParamCreator param)
+        {
+            using (var comm = new SqlCommand(commandText, new SqlConnector().GetConnection))
             {
-                command.Parameters.AddRange(args);
+                if (null != param && 0 < param.SqlParameters.Length)
+                {
+                    comm.Parameters.AddRange(param.SqlParameters);
+                }
+
+                return comm;
             }
         }
 
 		#endregion
 
 		#region Public static methods
-
-        /// <summary>
-        /// Execute select query
-        /// </summary>
-        public static List<T> Select<T>(string query, params object[] args)
+        
+        public static List<T> SelectToList<T>(string commandText, params object[] args)
         {
-            using (var connector = new SqlConnector())
-            using (var context = new DataContext(connector.Connection))
+            if (args == null)
             {
-                return context.ExecuteQuery<T>(query, args).ToList();
+                throw new ArgumentNullException();
+            }
+
+            using (var connect = new SqlConnector())
+            using (var context = new DataContext(connect.GetConnection))
+            {
+                return context.ExecuteQuery<T>(commandText, args).ToList();
             }
         }
 
-        /// <summary>
-        /// Execute select query
-        /// </summary>
-		public static DataTable Select(string query, params SqlParameter[] args)
-		{
-			using (var connector = new SqlConnector())
-            using (var command = new SqlCommand(query, connector.Connection))
-			{
-                SqlCommander.SetParameters(command, args);
+        public static DataSet SelectToDataSet(string commandText, SqlParamCreator param)
+        {
+            using (var command = SqlCommander.BuildCommand(commandText, param))
+            using (var adapt = new SqlDataAdapter(command))
+            {
+                var ds = new DataSet();
 
-                using (var adapt = new SqlDataAdapter(command))
+                try
                 {
-                    var table = new DataTable();
+                    adapt.Fill(ds);
+                }
+                finally
+                {
+                    command.Parameters.Clear();
+                }
 
-					adapt.Fill(table);
-					command.Parameters.Clear();
+                return ds;
+            }
+        }
 
-                    return table;
+        public static DataTable SelectToDataTable(string commandText, SqlParamCreator param)
+		{
+            return SqlCommander.SelectToDataSet(commandText, param).Tables[0];
+		}
+
+        public static int ExecuteNonQuery(string commandText, SqlParamCreator param)
+		{
+			using (var command = SqlCommander.BuildCommand(commandText, param))
+			{
+                try
+                {
+                    command.Connection.Open();
+
+                    return command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    command.Parameters.Clear();
                 }
 			}
 		}
 
-		/// <summary>
-		/// Save data
-		/// </summary>
-		public static int Save(List<string> queries)
+        public static int ExecuteStoredProcedure(string commandText, SqlParamCreator param)
+        {
+            using (var command = SqlCommander.BuildCommand(commandText, param))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                try
+                {
+                    command.Connection.Open();
+
+                    return command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    command.Parameters.Clear();
+                }
+            }
+        }
+
+        public static object Scalor(string commandText, SqlParamCreator param)
 		{
-			using (var connector = new SqlConnector())
-			using (var command = new SqlCommand())
+			using (var command = SqlCommander.BuildCommand(commandText, param))
 			{
-				command.Connection = connector.Connection;
-				
-				int affectedRow = 0;
-				
-				using (var tran = new TransactionScope())
-				{
-					connector.Open();
-					foreach (string q in queries)
-					{
-						command.CommandText = q;
-						affectedRow += command.ExecuteNonQuery();
-					}
+                try
+                {
+                    command.Connection.Open();
 
-					tran.Complete();
-				}
-
-				return affectedRow;
-			}
-		}
-
-		/// <summary>
-		/// Entry data
-		/// </summary>
-		/// <param name="query">Insert or Update SQL</param>
-		/// <param name="args">Application data</param>
-		public static int Save(string query, params SqlParameter[] args)
-		{
-			using (var connector = new SqlConnector())
-			using (var command = new SqlCommand(query, connector.Connection))
-			using (var tran = new TransactionScope())
-			{
-				SqlCommander.SetParameters(command, args);
-				int affectedRow = 0;
-				
-				connector.Open();
-				affectedRow = command.ExecuteNonQuery();
-				tran.Complete();
-				command.Parameters.Clear();
-
-				return affectedRow;
-			}
-		}
-
-		/// <summary>
-		/// Execute delete query
-		/// </summary>
-		public static int Delete(string query, params SqlParameter[] args)
-		{
-			return SqlCommander.Save(query, args);
-		}
-
-        /// <summary>
-		/// Get Scalor value
-        /// </summary>
-		public static int Scalor(string query, params SqlParameter[] args)
-		{
-			using (var connector = new SqlConnector())
-			using (var command = new SqlCommand(query, connector.Connection))
-			{
-				SqlCommander.SetParameters(command, args);
-
-				connector.Open();
-
-				int count = (int)command.ExecuteScalar();
-
-				command.Parameters.Clear();
-
-				connector.Close();
-
-				return count;
-			}
-		}
-
-        /// <summary>
-        /// Execute stored procedure
-        /// </summary>
-		public static int ExecStoredProcedure(string procName, params SqlParameter[] args)
-		{
-            using (var connector = new SqlConnector())
-			using (var command = new SqlCommand(procName, connector.Connection))
-			{
-				SqlCommander.SetParameters(command, args);
-				command.CommandType = CommandType.StoredProcedure;
-					
-				int affectedRow = 0;
-				using (var tran = new TransactionScope())
-				{
-					connector.Open();
-					affectedRow = command.ExecuteNonQuery();
-					tran.Complete();
-					command.Parameters.Clear();
-				}
-
-				return affectedRow;
+                    return command.ExecuteScalar();
+                }
+                finally
+                {
+                    command.Parameters.Clear();
+                }
 			}
 		}
 
