@@ -13,15 +13,14 @@ namespace KntLibrary.SQLServerDAO
 
         private static SqlCommand BuildCommand(string commandText, SqlParamCreator param)
         {
-            using (var comm = new SqlCommand(commandText, new SqlConnector().GetConnection))
-            {
-                if (null != param && 0 < param.SqlParameters.Length)
-                {
-                    comm.Parameters.AddRange(param.SqlParameters);
-                }
+            var comm = new SqlCommand(commandText, new SqlConnector().GetConnection);
 
-                return comm;
+            if (null != param && 0 < param.SqlParameters.Length)
+            {
+                comm.Parameters.AddRange(param.SqlParameters);
             }
+
+            return comm;
         }
 
 		#endregion
@@ -120,6 +119,10 @@ namespace KntLibrary.SQLServerDAO
 			}
 		}
 
+        public void BeginTransaction()
+        {
+ 
+        }
 		#endregion
 	}
 }

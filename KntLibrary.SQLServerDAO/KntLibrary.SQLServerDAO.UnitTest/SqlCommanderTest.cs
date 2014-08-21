@@ -254,6 +254,98 @@ namespace KntLibrary.SQLServerDAO.UnitTest
             Assert.AreEqual(1, result);
         }
 
+        /// <summary>
+        /// If insert statement occurs error, transaction rollback
+        /// </summary>
+        [Test]
+        public void SaveTest_Pattern6()
+        {
+            var upd = "update emp set empname = @empame,sal = @sal,hiredate = @hiredate,deptno = @depno where empno = @empno";
+
+            var e = new Employee();
+            var updParam = new SqlParamCreator();
+
+            e.empno = 11;
+            e.empname = "update rollback";
+            e.sal = 100000;
+            e.hiredate = null;
+            e.deptno = 10;
+            updParam.Add<Employee>(e);
+
+            //Error query
+            var ins = "insert into emp values (@empno ,@empame, @sal, @hiredate, @depno)";
+
+            var e2 = new Employee();
+            var insParam = new SqlParamCreator();
+            e.empno = 13;
+            e.empname = "update rollback";
+            e.sal = 100000;
+            e.hiredate = null;
+            e.deptno = 10;
+            updParam.Add<Employee>(e);
+
+            var result = true;
+            using (var tran = new TransactionScope())
+            {
+                try
+                {
+                    //Success
+                    SqlCommander.ExecuteNonQuery(upd, updParam);
+
+                    //Fault
+                    SqlCommander.ExecuteNonQuery(ins, insParam);
+
+                    tran.Complete();
+                }
+                catch
+                {
+                    result = false;
+                }
+            }
+
+            //Rollback check
+            Assert.AreEqual(false, result);
+        }
+
+        [Test]
+        public void SaveTest_Pattern7()
+        {
+            string delete = "delete from emp where empno = 30";
+            string upd = "update emp set empname = @empname, sal = @sal, hiredate = @hiredate, deptno = @depno where empno = @empno";
+
+            var e = new Employee();
+            var updParam = new SqlParamCreator();
+
+            e.empno = 11;
+            e.empname = "update";
+            e.sal = 100000;
+            e.hiredate = null;
+            e.deptno = 10;
+            updParam.Add<Employee>(e);
+
+            var result = true;
+            using (var tran = new TransactionScope())
+            {
+                try
+                {
+                    //Success
+                    SqlCommander.ExecuteNonQuery(delete, null);
+                    
+                    //Success
+                    SqlCommander.ExecuteNonQuery(upd, updParam);
+
+                    tran.Complete();
+                }
+                catch
+                {
+                    
+                    result = false;
+                }
+            }
+
+            //Commit
+            Assert.AreNotEqual(false, result);
+        }
         [Test]
         public void ExecTSqlTest_Pattern1()
         {
